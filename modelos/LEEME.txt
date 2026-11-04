@@ -1,0 +1,2 @@
+Modelo "silueta" (U2-Net) de rembg, licencia Apache 2.0.
+Lo usa Churys PC para quitar el fondo de la foto de la PC.
