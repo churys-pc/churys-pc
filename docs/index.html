@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Descargar Churys PC</title>
+<meta name="description" content="Descargá la app Churys PC para Windows: garantía, historial y soporte de tu PC.">
+<link rel="icon" href="logo-g.png">
+<style>
+  :root { --bg: #04070d; --card: #0b1220; --line: #1b2740; --text: #eef3ff; --muted: #8fa0bf; --acc: #1f7bff; --acc2: #3fa0ff; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px;
+    background: radial-gradient(900px 500px at 50% -10%, rgba(31,123,255,.22), transparent 70%), var(--bg);
+    color: var(--text); font: 16px/1.5 "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif; }
+  main { width: 100%; max-width: 520px; text-align: center; }
+  .logo { mix-blend-mode: lighten; width: 230px; max-width: 70%; height: auto; margin-bottom: 28px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 32px 26px; box-shadow: 0 20px 60px rgba(0,0,0,.45); }
+  h1 { font-size: 26px; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 26px; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; justify-content: center; width: 100%; padding: 16px 20px; border-radius: 14px;
+    background: linear-gradient(180deg, var(--acc2), var(--acc)); color: #fff; font-weight: 700; font-size: 18px; text-decoration: none;
+    box-shadow: 0 10px 30px rgba(31,123,255,.35); transition: transform .15s, box-shadow .15s; }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(31,123,255,.5); }
+  .btn svg { width: 22px; height: 22px; }
+  .meta { color: var(--muted); font-size: 13.5px; margin-top: 10px; min-height: 20px; }
+  .movil { display: none; background: rgba(255,190,60,.1); border: 1px solid rgba(255,190,60,.4); border-radius: 12px; padding: 12px 14px; margin-bottom: 18px; font-size: 14.5px; }
+  .es-movil .movil { display: block; }
+  ol { text-align: left; color: var(--muted); padding-left: 22px; margin: 26px 0 0; font-size: 14.5px; }
+  ol li { margin: 6px 0; }
+  ol b { color: var(--text); }
+  .nota { margin-top: 18px; text-align: left; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+  footer { margin-top: 20px; color: var(--muted); font-size: 13px; }
+  footer a { color: var(--acc2); text-decoration: none; }
+</style>
+</head>
+<body>
+<main>
+  <img class="logo" src="logo.png" alt="CHURY'S PC">
+  <div class="card">
+    <h1>App Churys PC</h1>
+    <p class="sub">Garantía, historial y soporte de tu PC, en tu computadora.</p>
+    <div class="movil">Esta app es para <b>PC con Windows</b>. Abrí este link desde tu computadora para instalarla.</div>
+    <a class="btn" id="bajar" href="https://github.com/churys-pc/churys-pc/releases/latest/download/ChurysPC-Setup.exe">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/></svg>
+      Descargar para Windows
+    </a>
+    <div class="meta" id="meta">Windows 10 y 11 · 64 bits</div>
+    <ol>
+      <li>Abrí el archivo <b>ChurysPC-Setup.exe</b> que se descargó.</li>
+      <li>Creá tu cuenta con el <b>mismo correo</b> que nos diste en la compra.</li>
+      <li>Listo: tu PC aparece sola, verificada por Churys PC.</li>
+    </ol>
+    <p class="nota">Si Windows muestra «Windows protegió su PC», tocá <b>Más información</b> y después <b>Ejecutar de todas formas</b>. La app se actualiza sola cuando hay una versión nueva.</p>
+  </div>
+  <footer><a href="https://churyspc.com">churyspc.com</a></footer>
+</main>
+<script>
+  // en el celular: aviso de que la app es para Windows
+  if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) document.body.classList.add('es-movil');
+  // versión y tamaño de la última publicación (si GitHub no responde, queda el texto por defecto)
+  fetch('https://api.github.com/repos/churys-pc/churys-pc/releases/latest')
+    .then(r => r.ok ? r.json() : null)
+    .then(rel => {
+      const a = rel && (rel.assets || []).find(x => x.name === 'ChurysPC-Setup.exe');
+      if (a) document.getElementById('meta').textContent = 'Versión ' + rel.tag_name.replace(/^v/, '') + ' · ' + Math.round(a.size / 1048576) + ' MB · Windows 10 y 11 · 64 bits';
+    })
+    .catch(() => {});
+</script>
+</body>
+</html>
