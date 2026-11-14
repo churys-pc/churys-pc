@@ -51,41 +51,27 @@
     D.cargando = true; D.error = ''; render();
     const [m, rsp] = await Promise.all([api({ accion: 'misDatos' }), api({ accion: 'leerRespaldo' })]);
     D.cargando = false;
-    if (!m?.ok) { D.error = msgErr(m); render(); return; }
+    if (!E.token) return;                       // la sesión venció mientras cargaba: ya se mostró el inicio de sesión
+    if (!m?.ok) {                               // sin conexión: se muestra lo último que se vio, con el aviso
+      D.error = m?.error === 'sin_conexion' && D.at ? `Sin conexión. Estás viendo los datos del ${new Date(D.at).toLocaleString('es-UY', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : msgErr(m);
+      render(); return;
+    }
     if (m.usuario) { E.usuario = m.usuario; guardarLS(E); }
     D.equipos = m.equipos || [];
-    try { D.respaldo = rsp?.ok && rsp.datos ? JSON.parse(rsp.datos) : null; } catch { D.respaldo = null; }
-    D.at = Date.now(); render();
+    if (rsp?.ok) { try { D.respaldo = rsp.datos ? JSON.parse(rsp.datos) : null; } catch { D.respaldo = null; } } // si falló solo el respaldo, queda el anterior
+    D.at = Date.now(); guardarDatos(); render();
   }
-  // PCs a mostrar: las que la app de Windows respaldó (con su equipo verificado, si tiene) + equipos sin PC respaldada
-  function pcs() {
-    const out = [], usados = new Set();
-    for (const p of D.respaldo?.pcs || []) {
-      const id = p.verified?.id, eq = id && D.equipos.find(e => String(e.equipo?.id).toUpperCase() === String(id).toUpperCase());
-      if (eq) usados.add(eq.equipo.id);
-      out.push({ uid: p.uid, nombre: p.name || 'Mi PC', pc: p, eq });
-    }
-    for (const e of D.equipos) if (!usados.has(e.equipo?.id)) out.push({ uid: 'eq:' + e.equipo.id, nombre: e.equipo.tipoVenta && /compon/i.test(e.equipo.tipoVenta) ? 'Compra ' + e.equipo.id : 'PC ' + e.equipo.id, pc: null, eq: e });
-    return out;
+  // Lo último que se cargó queda guardado en el celular para verlo sin conexión (se borra al cerrar sesión)
+  const LSD = 'churys-movil-datos';
+  function guardarDatos() { try { localStorage.setItem(LSD, JSON.stringify({ de: E.usuario?.email || '', at: D.at, equipos: D.equipos, respaldo: D.respaldo })); } catch { try { localStorage.removeItem(LSD); } catch {} } }
+  function leerDatos() {
+    try { const x = JSON.parse(localStorage.getItem(LSD) || 'null'); if (x && x.de === (E.usuario?.email || '') && Array.isArray(x.equipos)) { D.equipos = x.equipos; D.respaldo = x.respaldo || null; D.at = x.at || 0; } } catch {}
   }
+  // PCs, garantías y servicios: lógica pura en logica.js (probada en tools/pruebas/celular-unit.js)
+  const { fecha, dias } = CHURYS_LOGICA, garantia = CHURYS_LOGICA.garantia, enCurso = CHURYS_LOGICA.enCurso;
+  const pcs = () => CHURYS_LOGICA.pcs(D.equipos, D.respaldo);
   const actual = () => { const l = pcs(); return l.find(x => x.uid === E.pc) || l[0] || null; };
-
-  /* ---------- Fechas y garantías ---------- */
-  const hoy = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); };
-  const fecha = s => { const m = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
   const fmtF = s => { const d = fecha(s); return d ? d.toLocaleDateString('es-UY', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; };
-  const dias = s => { const d = fecha(s); return d ? Math.round((d - hoy()) / 864e5) : null; };
-  function garantia(x) {
-    const e = x.eq; if (!e) return null;
-    const comps = (e.componentes || []).filter(c => !c.reemplazado && c.garantiaHasta);
-    const pcCompleta = !/compon|servic/i.test(e.equipo.tipoVenta || '');
-    const distintas = new Set(comps.map(c => c.garantiaHasta)).size > 1;
-    if (pcCompleta && e.equipo.garantiaHasta && !distintas) return { general: true, hasta: e.equipo.garantiaHasta, dias: dias(e.equipo.garantiaHasta) };
-    const vivas = comps.map(c => ({ c, d: dias(c.garantiaHasta) })).filter(z => z.d >= 0).sort((a, b) => a.d - b.d);
-    if (!vivas.length) { const ult = comps.sort((a, b) => String(b.garantiaHasta).localeCompare(a.garantiaHasta))[0]; return ult ? { general: false, hasta: ult.garantiaHasta, dias: dias(ult.garantiaHasta), que: ult.modelo } : null; }
-    return { general: false, hasta: vivas[0].c.garantiaHasta, dias: vivas[0].d, que: vivas[0].c.modelo, mas: vivas.length - 1 };
-  }
-  const enCurso = x => (x.eq?.servicios || []).filter(s => s.estado && !/entregad/i.test(s.estado));
 
   /* ---------- Pantallas ---------- */
   const app = () => $('#app');
@@ -242,7 +228,9 @@
     $$('input', app()).forEach(i => i.onkeydown = e => { if (e.key === 'Enter') loginPaso(); });
   }
   async function loginPaso() {
-    const err = $('#l-err'), b = $('#l-ok'); err.textContent = '';
+    const err = $('#l-err'), b = $('#l-ok');
+    if (b.disabled) return;                     // doble toque o Enter repetido: un solo pedido
+    err.textContent = '';
     let r;
     b.disabled = true;
     if (L.paso === 'datos') {
@@ -263,7 +251,8 @@
   }
   function salir(vencida) {
     if (E.token && !vencida) api({ accion: 'logout' });
-    delete E.token; delete E.usuario; delete E.pc; guardarLS(E); D.equipos = []; D.respaldo = null; D.reportes = null;
+    delete E.token; delete E.usuario; delete E.pc; guardarLS(E); D.equipos = []; D.respaldo = null; D.reportes = null; D.at = 0; D.tab = 'pc';
+    try { localStorage.removeItem(LSD); } catch {}
     renderLogin(); if (vencida) $('#l-err').textContent = ERR.sesion_vencida;
   }
 
@@ -274,5 +263,5 @@
   }
 
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
-  if (E.token) cargar(); else renderLogin();
+  if (E.token) { leerDatos(); cargar(); } else renderLogin();
 })();
