@@ -1,0 +1,17 @@
+{
+  "name": "Churys PC",
+  "short_name": "Churys PC",
+  "description": "Tu PC de Churys PC en el celular: garantías, servicios, componentes y rendimiento en juegos.",
+  "lang": "es-UY",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#05080f",
+  "theme_color": "#05080f",
+  "icons": [
+    { "src": "icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
