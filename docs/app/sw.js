@@ -1,6 +1,6 @@
 // Churys PC (celular): guarda la app para que abra rápido y sin conexión. Los datos de la cuenta nunca se guardan acá.
-const VERSION = 'churys-movil-2';
-const ARCHIVOS = ['./', 'index.html', 'app.css', 'app.js', 'config.js', 'logo.png', 'icono-180.png', 'icono-192.png', 'manifest.webmanifest'];
+const VERSION = 'churys-movil-3';
+const ARCHIVOS = ['./', 'index.html', 'app.css', 'app.js', 'logica.js', 'config.js', 'logo.png', 'icono-180.png', 'icono-192.png', 'manifest.webmanifest'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(ARCHIVOS)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim()));
