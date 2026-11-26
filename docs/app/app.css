@@ -143,3 +143,4 @@ textarea { resize: vertical; } .codigo { font-size: 24px; letter-spacing: .4em; 
 @keyframes brillo { to { background-position: -200% 0; } }
 .toast { position: fixed; left: 16px; right: 16px; bottom: calc(92px + var(--safe-b)); z-index: 9; padding: 13px 14px; border-radius: 14px; background: #13213a; border: 1px solid var(--acc); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
 .separa { margin-top: 14px; }
+.item.ped .estado { display: inline-block; margin-top: 4px; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; background: rgba(63,160,255,.16); color: #8cc6ff; }
