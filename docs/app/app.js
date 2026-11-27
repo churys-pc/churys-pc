@@ -191,7 +191,8 @@
       <div class="card lista">
         <a class="item" href="../" rel="noopener">${ico('download')}<span><b>App para Windows</b><small class="muted">Monitoreo, Simulador de FPS, drivers y más</small></span>${ico('chevR', 'flecha')}</a>
         <a class="item" href="https://wa.me/59894677755" rel="noopener">${ico('whatsapp')}<span><b>WhatsApp</b><small class="muted">094 677 755</small></span>${ico('chevR', 'flecha')}</a>
-        <a class="item" href="https://churyspc.com" rel="noopener">${ico('globe')}<span><b>Churyspc.com</b><small class="muted">Tienda y novedades</small></span>${ico('chevR', 'flecha')}</a>
+        <a class="item" href="https://churyspc.com" rel="noopener">${ico('globe')}<span><b>Churyspc.com</b><small class="muted">Comprá productos y PCs</small></span>${ico('chevR', 'flecha')}</a>
+        <a class="item" href="https://www.churyspc.com/cotizar/armar" rel="noopener">${ico('globe')}<span><b>Armá y cotizá tu PC</b><small class="muted">En churyspc.com, con precios de hoy</small></span>${ico('chevR', 'flecha')}</a>
       </div>
       <div class="card"><div class="tit">${ico('user')}<h3>Cuenta</h3></div><p class="muted sm">${esc(u.email || '')}</p><button class="btn ghost" id="salir">${ico('logout')} Cerrar sesión en este celular</button></div>
       <p class="muted xs center">CHURY'S PC</p>`;
